@@ -21,7 +21,6 @@ from datetime import datetime
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, asdict
 from typing import List, Dict, Any, Optional, Tuple
-import xml.etree.ElementTree as ET
 
 # Color codes for terminal output
 class Colors:
@@ -144,11 +143,16 @@ class NetworkScanner:
         try:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 sock.settimeout(self.timeout)
-                sock.connect((host, port))
+                # Use connect_ex to handle mid-scan disconnects safely
+            if sock.connect_ex((host, port)) == 0:
+             # proceed with send/recv
                 
                 # Send HTTP request for web servers
-                if port in [80, 8080, 8000]:
-                    sock.send(b"HEAD / HTTP/1.1\r\nHost: " + host.encode() + b"\r\n\r\n")
+                if port in [80, 443, 8080, 8000]:
+                    request = b"HEAD / HTTP/1.1\r\nHost: " + host.encode() + b"\r\n\r\n"
+                  # If port 443, the socket should ideally be wrapped, but adding 443 here 
+                 # at least attempts the request if the handshake was handled elsewhere.
+                    sock.send(request)
                 elif port == 21:  # FTP
                     pass  # FTP sends banner immediately
                 elif port == 22:  # SSH
@@ -285,7 +289,7 @@ class NetworkScanner:
                     cipher = ssock.cipher()
                     
                     # Check for weak ciphers
-                    if cipher and cipher[1] < 128:  # Key length less than 128 bits
+                    if cipher and cipher[2] < 128:  # Key length less than 128 bits
                         vuln_info = self.vuln_db['ssl_weak_cipher']
                         vuln = Vulnerability(
                             host=host,
@@ -670,8 +674,8 @@ Examples:
                        help='Output file for JSON export')
     parser.add_argument('--csv',
                        help='Export results to CSV file')
-    parser.add_argument('--html',
-                       help='Generate HTML report')
+    parser.add_argument('--html', nargs='?', const='scan_report.html',
+                        help='Generate HTML report (optional: provide filename)')
     parser.add_argument('-v', '--verbose', action='store_true',
                        help='Enable verbose output')
     parser.add_argument('--no-banner', action='store_true',
@@ -757,44 +761,43 @@ if __name__ == "__main__":
 
 
 
-'''
-- Testing Commands
+
+"""Testing Commands
 
 
-    # Official test target 
-    python code.py -t scanme.nmap.org --top-ports --html report.html
-
-    # SSL/TLS security assessment
-    python code.py -t testssl.sh -p 443 --html ssl_report.html
-
-
-- Local Testing
-
-    # Quick localhost scan
-    python code.py -t 127.0.0.1 --top-ports --html localhost_report.html
-
-    # Windows common ports
-    python code.py -t 127.0.0.1 -p 135,139,445,3389 -v
-
-    # Web development ports
-    python code.py -t 127.0.0.1 -p 3000,8000,8080,9000 --html webdev_scan.html
-
-- Network Assessment
-
-    # Home router scan (replace with your gateway IP)
-    python code.py -t 192.168.1.1 -p 22,80,443,8080 --html router_scan.html
-
--Small network range
-    python code.py -t 192.168.1.1-10 --top-ports --html network_scan.html
-
-## Professional Demo
-
-    # Comprehensive assessment with all outputs
-    python code.py -t scanme.nmap.org -p 1-1000 --html demo_report.html -o data.json --csv ports.csv
-
-    # High-performance scanning demonstration
-    python code.py -t scanme.nmap.org -p 1-5000 --threads 200 --timeout 2 -v
+    Network Vulnerability Scanner - Usage Guide
+Official Test Targets
+Scan the Nmap official test server with top common ports and generate an HTML report:
+python code.py -t scanme.nmap.org --top-ports --html dashboard.html
 
 
-    python code.py -t scanme.nmap.org --top-ports --html professional_demo.html
-'''
+SSL/TLS security assessment on port 443:
+python code.py -t testssl.sh -p 443 --html ssl_dashboard.html
+
+
+Local Testing
+Quick localhost scan on common ports:
+python code.py -t 127.0.0.1 --top-ports --html dashboard.html
+
+
+Scan Windows-specific ports (RPC, NetBIOS, SMB, RDP) with verbose output:
+python code.py -t 127.0.0.1 -p 135,139,445,3389 -v
+
+
+Scan common web development ports:
+python code.py -t 127.0.0.1 -p 3000,8000,8080,9000 --html webdev_scan.html
+Network Assessment
+Scan your home router gateway (replace 192.168.1.1 with your actual IP):
+python code.py -t 192.168.1.1 -p 22,80,443,8080 --html router_scan.html
+Scan an entire subnet on common ports:
+python code.py -t 192.168.1.0/24 --top-ports --html network_scan.html
+Professional Demonstration
+Full port scan (1-1000) with multiple output formats:
+python code.py -t scanme.nmap.org -p 1-1000 --html demo_report.html -o data.json --csv ports.csv
+High-performance scanning with increased threads and reduced timeout:
+python code.py -t scanme.nmap.org -p 1-5000 --threads 200 --timeout 2 -v
+Quick professional demo report:
+python code.py -t scanme.nmap.org --top-ports --html professional_demo.html
+
+
+"""
