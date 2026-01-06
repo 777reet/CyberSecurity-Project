@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Security Scan Report</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --card-bg: #1e293b;
+            --text-main: #f1f5f9;
+            --text-dim: #94a3b8;
+            --accent: #38bdf8;
+            --critical: #ef4444;
+            --high: #f97316;
+            --medium: #eab308;
+            --low: #22c55e;
+        }
+
+        body { font-family: 'Inter', -apple-system, sans-serif; margin: 0; padding: 40px; background: var(--bg); color: var(--text-main); line-height: 1.6; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 1px solid #334155; padding-bottom: 20px; margin-bottom: 40px; }
+        .header h1 { margin: 0; font-size: 1.8em; letter-spacing: -0.5px; color: var(--accent); }
+        .header p { margin: 0; color: var(--text-dim); font-size: 0.9em; }
+
+        .summary-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 40px; }
+        .stat-card { background: var(--card-bg); padding: 20px; border-radius: 12px; border: 1px solid #334155; text-align: center; }
+        .stat-card span { display: block; font-size: 0.8em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 5px; }
+        .stat-card strong { font-size: 1.8em; color: var(--text-main); }
+
+        .section-title { font-size: 1.2em; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .section-title::after { content: ""; height: 1px; background: #334155; flex-grow: 1; }
+
+        .card { background: var(--card-bg); border-radius: 12px; border: 1px solid #334155; padding: 25px; margin-bottom: 30px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th { text-align: left; font-size: 0.85em; color: var(--text-dim); padding: 12px; border-bottom: 1px solid #334155; }
+        td { padding: 12px; border-bottom: 1px solid #1e293b; font-size: 0.95em; }
+        
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.75em; font-weight: 700; text-transform: uppercase; }
+        .high { background: rgba(249, 115, 22, 0.1); color: var(--high); border: 1px solid var(--high); }
+        .low { background: rgba(34, 197, 94, 0.1); color: var(--low); border: 1px solid var(--low); }
+        
+        .vuln-item { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #334155; }
+        .vuln-item:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .vuln-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .vuln-header h4 { margin: 0; font-size: 1.1em; color: var(--accent); }
+        
+        .desc { font-size: 0.9em; color: var(--text-dim); margin: 5px 0; }
+        .rec { font-size: 0.9em; color: var(--text-main); background: #0f172a; padding: 10px; border-radius: 6px; margin-top: 10px; }
+        .rec b { color: var(--accent); }
+
+        .footer { text-align: center; color: var(--text-dim); font-size: 0.8em; margin-top: 60px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>Security Assessment Report</h1>
+                <p>Target: scanme.nmap.org</p>
+            </div>
+            <p>2025-10-17 • 19:14:26</p>
+        </div>
+
+        <div class="summary-grid">
+            <div class="stat-card"><span>Risk Score</span><strong>5.05</strong></div>
+            <div class="stat-card"><span>Total Hosts</span><strong>1</strong></div>
+            <div class="stat-card"><span>Open Ports</span><strong>2</strong></div>
+            <div class="stat-card"><span>Threats</span><strong>2</strong></div>
+        </div>
+
+        <div class="section-title">Discovered Services</div>
+        <div class="card">
+            <table>
+                <thead>
+                    <tr>
+                        <th>PORT</th>
+                        <th>SERVICE</th>
+                        <th>VERSION</th>
+                        <th>STATE</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>22</td>
+                        <td>ssh</td>
+                        <td>OpenSSH_6.6.1p1</td>
+                        <td><span style="color:var(--low)">● open</span></td>
+                    </tr>
+                    <tr>
+                        <td>80</td>
+                        <td>http</td>
+                        <td>Apache/2.4.7</td>
+                        <td><span style="color:var(--low)">● open</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section-title">Vulnerabilities Found</div>
+        <div class="card">
+            <div class="vuln-item">
+                <div class="vuln-header">
+                    <h4>Unencrypted Protocol Usage</h4>
+                    <span class="badge high">High Risk</span>
+                </div>
+                <p class="desc">Host: scanme.nmap.org (Port 80)</p>
+                <div class="rec"><b>Fix:</b> Migrate to encrypted protocol variant (HTTPS, SFTP, etc.)</div>
+            </div>
+
+            <div class="vuln-item">
+                <div class="vuln-header">
+                    <h4>Server Banner Disclosure</h4>
+                    <span class="badge low">Low Risk</span>
+                </div>
+                <p class="desc">Host: scanme.nmap.org (Port 80)</p>
+                <div class="rec"><b>Fix:</b> Configure server to hide version information in headers.</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Generated by Network Vulnerability Scanner • Confidential Report
+        </div>
+    </div>
+</body>
+</html>
