@@ -488,7 +488,7 @@ class NetworkScanner:
         
         print(f"{Colors.GREEN}[EXPORT]{Colors.END} Results exported to {filename}")
 
-def export_html_report(self, filename: str, results: Dict[str, List[ScanResult]]):
+    def export_html_report(self, filename: str, results: Dict[str, List[ScanResult]]):
         """Generate professional comprehensive HTML report"""
         risk_assessment = self.generate_risk_score()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
@@ -893,44 +893,41 @@ if __name__ == "__main__":
     main()
 
 
-
-
 """Testing Commands
-
 
     Network Vulnerability Scanner - Usage Guide
 Official Test Targets
 Scan the Nmap official test server with top common ports and generate an HTML report:
 python code.py -t scanme.nmap.org --top-ports --html dashboard.html
 
-
 SSL/TLS security assessment on port 443:
 python code.py -t testssl.sh -p 443 --html ssl_dashboard.html
-
 
 Local Testing
 Quick localhost scan on common ports:
 python code.py -t 127.0.0.1 --top-ports --html dashboard.html
 
-
 Scan Windows-specific ports (RPC, NetBIOS, SMB, RDP) with verbose output:
 python code.py -t 127.0.0.1 -p 135,139,445,3389 -v
 
-
 Scan common web development ports:
 python code.py -t 127.0.0.1 -p 3000,8000,8080,9000 --html webdev_scan.html
+
 Network Assessment
 Scan your home router gateway (replace 192.168.1.1 with your actual IP):
 python code.py -t 192.168.1.1 -p 22,80,443,8080 --html router_scan.html
+
 Scan an entire subnet on common ports:
 python code.py -t 192.168.1.0/24 --top-ports --html network_scan.html
+
 Professional Demonstration
 Full port scan (1-1000) with multiple output formats:
 python code.py -t scanme.nmap.org -p 1-1000 --html demo_report.html -o data.json --csv ports.csv
+
 High-performance scanning with increased threads and reduced timeout:
 python code.py -t scanme.nmap.org -p 1-5000 --threads 200 --timeout 2 -v
+
 Quick professional demo report:
 python code.py -t scanme.nmap.org --top-ports --html professional_demo.html
-
 
 """
