@@ -488,8 +488,8 @@ class NetworkScanner:
         
         print(f"{Colors.GREEN}[EXPORT]{Colors.END} Results exported to {filename}")
 
-    def export_html_report(self, filename: str, results: Dict[str, List[ScanResult]]):
-        """Generate professional HTML report"""
+def export_html_report(self, filename: str, results: Dict[str, List[ScanResult]]):
+        """Generate professional comprehensive HTML report"""
         risk_assessment = self.generate_risk_score()
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
@@ -499,77 +499,150 @@ class NetworkScanner:
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Vulnerability Assessment Report</title>
+    <title>Network Security Assessment Report</title>
     <style>
-        body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 20px; background: #f5f5f5; }}
-        .container {{ max-width: 1200px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 20px rgba(0,0,0,0.1); }}
-        .header {{ text-align: center; border-bottom: 3px solid #2c3e50; padding-bottom: 20px; margin-bottom: 30px; }}
-        .header h1 {{ color: #2c3e50; margin: 0; font-size: 2.5em; }}
-        .header p {{ color: #7f8c8d; margin: 10px 0 0 0; font-size: 1.1em; }}
-        .risk-summary {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 30px; }}
-        .risk-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 15px; }}
-        .risk-card {{ background: rgba(255,255,255,0.1); padding: 15px; border-radius: 5px; text-align: center; }}
-        .risk-card h3 {{ margin: 0 0 5px 0; font-size: 2em; }}
-        .risk-card p {{ margin: 0; opacity: 0.9; }}
-        .section {{ margin-bottom: 30px; }}
-        .section h2 {{ color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }}
-        .host-section {{ background: #ecf0f1; padding: 20px; border-radius: 8px; margin-bottom: 20px; }}
-        .host-section h3 {{ color: #2c3e50; margin-top: 0; }}
-        .port-table {{ width: 100%; border-collapse: collapse; margin-top: 15px; }}
-        .port-table th, .port-table td {{ padding: 12px; text-align: left; border-bottom: 1px solid #bdc3c7; }}
-        .port-table th {{ background: #34495e; color: white; }}
-        .port-table tr:hover {{ background: #f8f9fa; }}
-        .vuln-item {{ background: #fff; border-left: 5px solid #e74c3c; padding: 15px; margin-bottom: 15px; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }}
-        .vuln-critical {{ border-left-color: #c0392b; }}
-        .vuln-high {{ border-left-color: #e74c3c; }}
-        .vuln-medium {{ border-left-color: #f39c12; }}
-        .vuln-low {{ border-left-color: #3498db; }}
-        .severity {{ padding: 4px 8px; border-radius: 4px; color: white; font-weight: bold; }}
-        .severity.critical {{ background: #c0392b; }}
-        .severity.high {{ background: #e74c3c; }}
-        .severity.medium {{ background: #f39c12; }}
-        .severity.low {{ background: #3498db; }}
-        .footer {{ text-align: center; margin-top: 40px; padding-top: 20px; border-top: 1px solid #bdc3c7; color: #7f8c8d; }}
+        * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+        body {{ font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0a0e27; color: #e0e0e0; }}
+        .container {{ max-width: 1400px; margin: 0 auto; padding: 20px; }}
+        
+        /* Header */
+        .header {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; border-radius: 15px; margin-bottom: 30px; box-shadow: 0 10px 40px rgba(0,0,0,0.3); }}
+        .header h1 {{ color: white; font-size: 2.5em; margin-bottom: 10px; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }}
+        .header p {{ color: rgba(255,255,255,0.9); font-size: 1.1em; }}
+        
+        /* Dashboard Grid */
+        .dashboard {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px; }}
+        .dashboard-card {{ background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.3); transition: transform 0.3s; }}
+        .dashboard-card:hover {{ transform: translateY(-5px); }}
+        .dashboard-card h3 {{ font-size: 2.5em; color: #4fc3f7; margin-bottom: 10px; }}
+        .dashboard-card p {{ color: rgba(255,255,255,0.8); font-size: 1em; }}
+        
+        /* Risk Level */
+        .risk-level {{ background: #1a1f3a; padding: 30px; border-radius: 12px; margin-bottom: 30px; border-left: 5px solid; }}
+        .risk-level.critical {{ border-left-color: #f44336; }}
+        .risk-level.high {{ border-left-color: #ff9800; }}
+        .risk-level.medium {{ border-left-color: #ffc107; }}
+        .risk-level.low {{ border-left-color: #4caf50; }}
+        .risk-level h2 {{ color: #fff; margin-bottom: 15px; }}
+        .risk-breakdown {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-top: 20px; }}
+        .risk-item {{ background: rgba(255,255,255,0.05); padding: 15px; border-radius: 8px; text-align: center; }}
+        .risk-item h4 {{ color: #4fc3f7; font-size: 1.8em; margin-bottom: 5px; }}
+        .risk-item p {{ color: rgba(255,255,255,0.7); }}
+        
+        /* Tabs */
+        .tabs {{ display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }}
+        .tab {{ background: #1a1f3a; color: #4fc3f7; padding: 12px 25px; border-radius: 8px; cursor: pointer; transition: all 0.3s; border: 2px solid transparent; }}
+        .tab:hover {{ background: #252b4a; }}
+        .tab.active {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-color: #4fc3f7; }}
+        
+        /* Content Sections */
+        .content-section {{ display: none; }}
+        .content-section.active {{ display: block; }}
+        
+        /* Host Cards */
+        .host-card {{ background: #1a1f3a; padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }}
+        .host-card h3 {{ color: #4fc3f7; margin-bottom: 20px; font-size: 1.5em; display: flex; align-items: center; }}
+        .host-card h3::before {{ content: "🖥️"; margin-right: 10px; }}
+        
+        /* Port Table */
+        .port-table {{ width: 100%; border-collapse: collapse; margin-top: 15px; background: #0f1419; border-radius: 8px; overflow: hidden; }}
+        .port-table th {{ background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; text-align: left; font-weight: 600; }}
+        .port-table td {{ padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); }}
+        .port-table tr:hover {{ background: rgba(79, 195, 247, 0.1); }}
+        .port-badge {{ background: #4caf50; color: white; padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: bold; }}
+        
+        /* Vulnerability Cards */
+        .vuln-card {{ background: #1a1f3a; padding: 20px; border-radius: 12px; margin-bottom: 15px; border-left: 5px solid; box-shadow: 0 3px 10px rgba(0,0,0,0.2); }}
+        .vuln-card.critical {{ border-left-color: #f44336; }}
+        .vuln-card.high {{ border-left-color: #ff9800; }}
+        .vuln-card.medium {{ border-left-color: #ffc107; }}
+        .vuln-card.low {{ border-left-color: #4fc3f7; }}
+        .vuln-header {{ display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }}
+        .vuln-title {{ color: #fff; font-size: 1.2em; font-weight: 600; }}
+        .severity-badge {{ padding: 6px 16px; border-radius: 20px; color: white; font-weight: bold; font-size: 0.9em; }}
+        .severity-badge.critical {{ background: #f44336; }}
+        .severity-badge.high {{ background: #ff9800; }}
+        .severity-badge.medium {{ background: #ffc107; color: #000; }}
+        .severity-badge.low {{ background: #4fc3f7; }}
+        .vuln-details {{ color: rgba(255,255,255,0.8); line-height: 1.6; }}
+        .vuln-details p {{ margin: 10px 0; }}
+        .vuln-details strong {{ color: #4fc3f7; }}
+        
+        /* Charts */
+        .chart-container {{ background: #1a1f3a; padding: 25px; border-radius: 12px; margin-bottom: 20px; }}
+        .chart-container h3 {{ color: #4fc3f7; margin-bottom: 20px; }}
+        
+        /* Footer */
+        .footer {{ text-align: center; margin-top: 50px; padding: 30px; background: #1a1f3a; border-radius: 12px; color: rgba(255,255,255,0.6); }}
+        .footer p {{ margin: 5px 0; }}
+        
+        /* No data message */
+        .no-data {{ text-align: center; padding: 40px; color: rgba(255,255,255,0.5); font-size: 1.1em; }}
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>Network Vulnerability Assessment Report</h1>
-            <p>Generated on {timestamp}</p>
+            <h1>🛡️ Network Security Assessment Report</h1>
+            <p>Comprehensive Vulnerability Analysis & Risk Assessment</p>
+            <p style="opacity: 0.8; margin-top: 10px;">Generated: {timestamp}</p>
         </div>
         
-        <div class="risk-summary">
-            <h2 style="margin-top: 0;">Executive Summary</h2>
-            <p>Overall Risk Level: <strong>{risk_assessment['overall_risk']}</strong> | Average CVSS Score: <strong>{risk_assessment['risk_score']}</strong></p>
-            <div class="risk-grid">
-                <div class="risk-card">
-                    <h3>{len(results)}</h3>
-                    <p>Hosts Scanned</p>
+        <div class="dashboard">
+            <div class="dashboard-card">
+                <h3>{len(results)}</h3>
+                <p>Hosts Scanned</p>
+            </div>
+            <div class="dashboard-card">
+                <h3>{sum(len(host_results) for host_results in results.values())}</h3>
+                <p>Open Ports Detected</p>
+            </div>
+            <div class="dashboard-card">
+                <h3>{risk_assessment['total_vulns']}</h3>
+                <p>Vulnerabilities Found</p>
+            </div>
+            <div class="dashboard-card">
+                <h3>{round(time.time() - self.start_time, 2)}s</h3>
+                <p>Scan Duration</p>
+            </div>
+        </div>
+        
+        <div class="risk-level {risk_assessment['overall_risk'].lower()}">
+            <h2>🎯 Risk Assessment: {risk_assessment['overall_risk']} (CVSS: {risk_assessment['risk_score']})</h2>
+            <div class="risk-breakdown">
+                <div class="risk-item">
+                    <h4>{risk_assessment['critical']}</h4>
+                    <p>Critical</p>
                 </div>
-                <div class="risk-card">
-                    <h3>{sum(len(host_results) for host_results in results.values())}</h3>
-                    <p>Open Ports</p>
+                <div class="risk-item">
+                    <h4>{risk_assessment['high']}</h4>
+                    <p>High</p>
                 </div>
-                <div class="risk-card">
-                    <h3>{risk_assessment['total_vulns']}</h3>
-                    <p>Vulnerabilities</p>
+                <div class="risk-item">
+                    <h4>{risk_assessment['medium']}</h4>
+                    <p>Medium</p>
                 </div>
-                <div class="risk-card">
-                    <h3>{risk_assessment['critical'] + risk_assessment['high']}</h3>
-                    <p>High Risk Issues</p>
+                <div class="risk-item">
+                    <h4>{risk_assessment['low']}</h4>
+                    <p>Low</p>
                 </div>
             </div>
         </div>
         
-        <div class="section">
-            <h2>Discovered Hosts & Services</h2>
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('hosts')">📊 Discovered Hosts</div>
+            <div class="tab" onclick="switchTab('vulnerabilities')">⚠️ Vulnerabilities</div>
+            <div class="tab" onclick="switchTab('recommendations')">💡 Recommendations</div>
+        </div>
+        
+        <div id="hosts" class="content-section active">
+            <h2 style="color: #4fc3f7; margin-bottom: 20px;">Discovered Hosts & Services</h2>
         """
         
         for host, host_results in results.items():
             html_content += f"""
-            <div class="host-section">
-                <h3>Host: {host}</h3>
+            <div class="host-card">
+                <h3>{host}</h3>
                 <table class="port-table">
                     <thead>
                         <tr>
@@ -577,18 +650,21 @@ class NetworkScanner:
                             <th>Service</th>
                             <th>Version</th>
                             <th>State</th>
+                            <th>Banner</th>
                         </tr>
                     </thead>
                     <tbody>
             """
             
             for result in sorted(host_results, key=lambda x: x.port):
+                banner_preview = result.banner[:80] + '...' if len(result.banner) > 80 else result.banner
                 html_content += f"""
                         <tr>
-                            <td>{result.port}</td>
+                            <td><strong>{result.port}</strong></td>
                             <td>{result.service}</td>
                             <td>{result.version if result.version != 'unknown' else 'N/A'}</td>
-                            <td>{result.state}</td>
+                            <td><span class="port-badge">{result.state}</span></td>
+                            <td style="font-size: 0.85em; color: rgba(255,255,255,0.6);">{banner_preview}</td>
                         </tr>
                 """
             
@@ -598,33 +674,90 @@ class NetworkScanner:
             </div>
             """
         
-        if self.vulnerabilities:
-            html_content += """
+        html_content += """
         </div>
         
-        <div class="section">
-            <h2>Vulnerability Details</h2>
-            """
-            
+        <div id="vulnerabilities" class="content-section">
+            <h2 style="color: #4fc3f7; margin-bottom: 20px;">Vulnerability Details</h2>
+        """
+        
+        if self.vulnerabilities:
             for i, vuln in enumerate(self.vulnerabilities, 1):
                 severity_class = vuln.severity.lower()
                 html_content += f"""
-            <div class="vuln-item vuln-{severity_class}">
-                <h4>[{i}] {vuln.host}:{vuln.port} - {vuln.service}</h4>
-                <p><span class="severity {severity_class}">{vuln.severity}</span> CVSS Score: {vuln.cvss_score}</p>
-                <p><strong>Description:</strong> {vuln.description}</p>
-                <p><strong>Recommendation:</strong> {vuln.recommendation}</p>
+            <div class="vuln-card {severity_class}">
+                <div class="vuln-header">
+                    <div class="vuln-title">#{i} {vuln.host}:{vuln.port} - {vuln.service}</div>
+                    <span class="severity-badge {severity_class}">{vuln.severity} (CVSS: {vuln.cvss_score})</span>
+                </div>
+                <div class="vuln-details">
+                    <p><strong>Issue:</strong> {vuln.description}</p>
+                    <p><strong>Recommendation:</strong> {vuln.recommendation}</p>
+                </div>
             </div>
                 """
+        else:
+            html_content += '<div class="no-data">✅ No vulnerabilities detected</div>'
         
         html_content += """
         </div>
         
+        <div id="recommendations" class="content-section">
+            <h2 style="color: #4fc3f7; margin-bottom: 20px;">Security Recommendations</h2>
+            <div class="host-card">
+                <h3>Priority Actions</h3>
+                <div class="vuln-details">
+        """
+        
+        if risk_assessment['critical'] > 0:
+            html_content += '<p><strong style="color: #f44336;">🔴 CRITICAL:</strong> Address critical vulnerabilities immediately. These pose severe security risks.</p>'
+        if risk_assessment['high'] > 0:
+            html_content += '<p><strong style="color: #ff9800;">🟠 HIGH:</strong> Remediate high-severity issues within 24-48 hours.</p>'
+        if risk_assessment['medium'] > 0:
+            html_content += '<p><strong style="color: #ffc107;">🟡 MEDIUM:</strong> Plan remediation for medium-severity issues within the next week.</p>'
+        if risk_assessment['total_vulns'] == 0:
+            html_content += '<p><strong style="color: #4caf50;">🟢 GOOD:</strong> No major vulnerabilities detected. Continue regular security monitoring.</p>'
+        
+        html_content += """
+                    <p style="margin-top: 20px;"><strong>General Best Practices:</strong></p>
+                    <ul style="margin-left: 20px; line-height: 2;">
+                        <li>Keep all services and software up to date</li>
+                        <li>Use strong, unique passwords and enable multi-factor authentication</li>
+                        <li>Disable unnecessary services and close unused ports</li>
+                        <li>Implement network segmentation and firewall rules</li>
+                        <li>Regularly monitor logs for suspicious activity</li>
+                        <li>Conduct periodic security assessments</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        
         <div class="footer">
-            <p>This report was generated by Network Vulnerability Scanner & Risk Assessment Tool</p>
-            <p>For questions regarding this assessment, please contact your security team.</p>
+            <p><strong>Network Vulnerability Scanner & Risk Assessment Tool v2.0</strong></p>
+            <p>This report contains sensitive security information. Handle with appropriate care.</p>
+            <p>For questions or concerns, contact your security team.</p>
         </div>
     </div>
+    
+    <script>
+        function switchTab(tabName) {
+            // Hide all content sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected content section
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+    </script>
 </body>
 </html>
         """
@@ -632,7 +765,7 @@ class NetworkScanner:
         with open(filename, 'w') as f:
             f.write(html_content)
         
-        print(f"{Colors.GREEN}[EXPORT]{Colors.END} HTML report generated: {filename}")
+        print(f"{Colors.GREEN}[EXPORT]{Colors.END} Comprehensive HTML report generated: {filename}")
 
 def parse_port_range(port_string: str) -> List[int]:
     """Parse port range string into list of ports"""
