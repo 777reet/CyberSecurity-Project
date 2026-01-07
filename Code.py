@@ -144,26 +144,26 @@ class NetworkScanner:
             with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                 sock.settimeout(self.timeout)
                 # Use connect_ex to handle mid-scan disconnects safely
-            if sock.connect_ex((host, port)) == 0:
-             # proceed with send/recv
-                
-                # Send HTTP request for web servers
-                if port in [80, 443, 8080, 8000]:
-                    request = b"HEAD / HTTP/1.1\r\nHost: " + host.encode() + b"\r\n\r\n"
-                  # If port 443, the socket should ideally be wrapped, but adding 443 here 
-                 # at least attempts the request if the handshake was handled elsewhere.
-                    sock.send(request)
-                elif port == 21:  # FTP
-                    pass  # FTP sends banner immediately
-                elif port == 22:  # SSH
-                    pass  # SSH sends version immediately
-                elif port == 25:  # SMTP
-                    pass  # SMTP sends banner immediately
-                else:
-                    sock.send(b"\r\n")
-                
-                banner = sock.recv(1024).decode('utf-8', errors='ignore').strip()
-                return banner[:200]  # Limit banner length
+                if sock.connect_ex((host, port)) == 0:
+                    # proceed with send/recv
+                    
+                    # Send HTTP request for web servers
+                    if port in [80, 443, 8080, 8000]:
+                        request = b"HEAD / HTTP/1.1\r\nHost: " + host.encode() + b"\r\n\r\n"
+                        # If port 443, the socket should ideally be wrapped, but adding 443 here 
+                        # at least attempts the request if the handshake was handled elsewhere.
+                        sock.send(request)
+                    elif port == 21:  # FTP
+                        pass  # FTP sends banner immediately
+                    elif port == 22:  # SSH
+                        pass  # SSH sends version immediately
+                    elif port == 25:  # SMTP
+                        pass  # SMTP sends banner immediately
+                    else:
+                        sock.send(b"\r\n")
+                    
+                    banner = sock.recv(1024).decode('utf-8', errors='ignore').strip()
+                    return banner[:200]  # Limit banner length
         except:
             return ""
 
