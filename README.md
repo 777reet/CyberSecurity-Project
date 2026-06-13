@@ -1,57 +1,94 @@
-## 🛡 Network Vulnerability Scanner
+# Network Vulnerability Scanner
 
-Professional network vulnerability scanner that performs automated security assessments and generates comprehensive risk reports.
+A Python-based network reconnaissance and vulnerability assessment tool designed to automate host discovery, port scanning, service fingerprinting, and vulnerability identification. The scanner generates professional reports with risk scoring and export capabilities for security analysis and assessment workflows.
 
 ## Features
 
-- **Multi-threaded Port Scanning** - Concurrent scanning with up to 1Perfect! This is a clean, minimal README that still shows professionalism. Here's what makes it effective:🎯 Why This README Works for Resumes:Concise but Complete
+* Multi-threaded port scanning for single hosts and CIDR network ranges
+* Banner grabbing and service version fingerprinting
+* SSL/TLS configuration and cipher strength analysis
+* Detection of common security weaknesses, including:
 
-Shows all key features without overwhelming detail
-Demonstrates technical capabilities clearly
-Includes professional security terminology
+  * Unencrypted protocols (FTP, Telnet, HTTP, POP3, IMAP)
+  * Server version disclosure
+  * Exposed database and remote access services
+  * Weak SSL/TLS cipher suites
+* CVSS-based severity scoring and overall risk classification
+* Automatic generation of HTML security reports
+* JSON and CSV export support
+* Configurable thread count and connection timeouts
 
-Real commands that showcase different use cases
-Shows enterprise-level functionality
-Demonstrates tool versatility
-Security Expertise
+## Tech Stack
 
-Lists specific vulnerability types detected
-Shows understanding of CVSS methodology
-Includes responsible disclosure notice
-Claude can make mistakes. Please double-check responses. Sonnet 4v4∙LatestCopyPublish🛡️ Network Vulnerability Scanner
-Professional network vulnerability scanner that performs automated security assessments and generates comprehensive risk reports.
-Features
+* Python 3
+* socket
+* ssl
+* threading
+* concurrent.futures
+* json
+* csv
+* argparse
+* ipaddress
 
-Multi-threaded Port Scanning - Concurrent scanning with up to 100 threads
-Service Fingerprinting - Automatic service detection and version identification
-SSL/TLS Assessment - Cryptographic security vulnerability analysis
-Vulnerability Detection - Built-in security issue database with CVSS scoring
-Risk Assessment - Industry-standard vulnerability severity classification
-Professional Reports - HTML executive reports, JSON exports, and CSV data
+## Usage
 
-Security Features
-Vulnerability Detection:
+### Scan a Single Host
 
-Unencrypted protocols (HTTP, FTP, Telnet)
-Information disclosure (server headers, banners)
-SSL/TLS weaknesses and cipher analysis
-Default credential risks on management ports
-Service version-based vulnerability identification
+```bash
+python Code.py -t scanme.nmap.org --top-ports
+```
 
-Risk Assessment:
+### Scan a Specific Port Range
 
-CVSS-based vulnerability scoring
-Severity classification (Critical, High, Medium, Low)
-Overall network risk calculation
-Executive-level security summaries
+```bash
+python Code.py -t 192.168.1.1 -p 1-1000
+```
 
-## Output : 
+### Scan a Subnet and Export JSON
 
-<img width="1919" height="1035" alt="image" src="https://github.com/user-attachments/assets/b7917b0c-4cce-4f26-b54b-8cc504045f53" />
+```bash
+python Code.py -t 192.168.1.0/24 --top-ports -o results.json
+```
 
-<img width="1911" height="1026" alt="image" src="https://github.com/user-attachments/assets/2e7e7dfa-1ec4-41d7-b3f8-6b4068c39761" />
+### Full Port Scan with CSV Export
 
-<img width="1744" height="1012" alt="image" src="https://github.com/user-attachments/assets/53b8f90f-7e34-4618-b452-3f1473863a73" />
+```bash
+python Code.py -t 192.168.1.1 -p 1-65535 --csv ports.csv
+```
 
-<img width="1917" height="1033" alt="image" src="https://github.com/user-attachments/assets/a94b0f02-15b0-4940-b235-0f30a25e6b24" />
+## Command-Line Options
 
+| Flag          | Description                                     |
+| ------------- | ----------------------------------------------- |
+| `-t`          | Target IP address, hostname, or CIDR range      |
+| `-p`          | Port range (for example: `1-1000`, `22,80,443`) |
+| `--top-ports` | Scan the 20 most common ports                   |
+| `--threads`   | Number of worker threads (default: `100`)       |
+| `--timeout`   | Connection timeout in seconds (default: `3`)    |
+| `-o`          | Export results to JSON                          |
+| `--csv`       | Export results to CSV                           |
+| `-v`          | Enable verbose output                           |
+
+## Reports
+
+Each scan automatically generates a fresh `report.html` file containing:
+
+* Scan summary and risk dashboard
+* Open ports and detected services
+* Banner and version information
+* Identified vulnerabilities with CVSS scores
+* Prioritized remediation recommendations
+
+## Output Screenshots
+
+### Scan Results
+
+![Scan Results](Outputs/first.png)
+
+### Generated HTML Report
+
+![HTML Report](Outputs/second.png)
+
+## Responsible Use
+
+This project is intended solely for educational purposes and authorized security assessments. Only scan systems that you own or have explicit permission to test. Unauthorized network scanning may violate laws and organizational policies.
