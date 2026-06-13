@@ -1,8 +1,0 @@
-host,port,service,version,state,banner
-scanme.nmap.org,80,http,Apache/2.4.7 (Ubuntu),open,"HTTP/1.1 200 OK
-Date: Sun, 24 Aug 2025 19:30:32 GMT
-Server: Apache/2.4.7 (Ubuntu)
-Accept-Ranges: bytes
-Vary: Accept-Encoding
-Content-Type: text/html"
-scanme.nmap.org,22,ssh,SSH-2.0-OpenSSH_6.6.1p1,open,SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13

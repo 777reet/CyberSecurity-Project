@@ -54,3 +54,4 @@ Executive-level security summaries
 <img width="1744" height="1012" alt="image" src="https://github.com/user-attachments/assets/53b8f90f-7e34-4618-b452-3f1473863a73" />
 
 <img width="1917" height="1033" alt="image" src="https://github.com/user-attachments/assets/a94b0f02-15b0-4940-b235-0f30a25e6b24" />
+

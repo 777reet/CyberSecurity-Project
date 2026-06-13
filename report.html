@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Security Assessment Report</title>
+  <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css">
+  <style>
+    :root {
+      --bg:       #f0f2f5;
+      --surface:  #ffffff;
+      --border:   #e2e6ea;
+      --accent:   #1d3557;
+      --accent2:  #457b9d;
+      --text:     #1f2937;
+      --muted:    #6b7280;
+      --critical: #b91c1c;
+      --high:     #c2410c;
+      --medium:   #b45309;
+      --low:      #1d4ed8;
+    }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      font-size: 0.9rem;
+    }
+    .page-header {
+      background: var(--accent);
+      color: #fff;
+      padding: 2rem 0 1.75rem;
+      border-bottom: 3px solid var(--accent2);
+    }
+    .page-header h1 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      letter-spacing: -0.01em;
+    }
+    .page-header .meta { color: #94a3b8; font-size: 0.78rem; }
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.4rem 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .stat-card .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1;
+    }
+    .stat-card .stat-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-top: 0.4rem;
+    }
+    .risk-banner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid transparent;
+      border-radius: 8px;
+      padding: 1.1rem 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .risk-banner.critical { border-left-color: var(--critical); }
+    .risk-banner.high     { border-left-color: var(--high); }
+    .risk-banner.medium   { border-left-color: var(--medium); }
+    .risk-banner.low      { border-left-color: #16a34a; }
+    .risk-cell .cell-label {
+      font-size: 0.65rem;
+      text-transform: uppercase;
+      letter-spacing: 0.09em;
+      color: var(--muted);
+      margin-bottom: 0.15rem;
+    }
+    .risk-cell .cell-value {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .risk-divider {
+      width: 1px;
+      background: var(--border);
+      align-self: stretch;
+      margin: 0 0.5rem;
+    }
+    .section-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.4rem;
+      margin-bottom: 1rem;
+    }
+    .nav-tabs { border-bottom-color: var(--border); }
+    .nav-tabs .nav-link {
+      color: var(--muted);
+      border: none;
+      border-bottom: 2px solid transparent;
+      border-radius: 0;
+      font-size: 0.83rem;
+      font-weight: 500;
+      padding: 0.6rem 1.1rem;
+    }
+    .nav-tabs .nav-link:hover { color: var(--text); }
+    .nav-tabs .nav-link.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+      background: transparent;
+    }
+    .host-block {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .host-title {
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      padding: 0.6rem 1rem;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--accent2);
+    }
+    .table { color: var(--text); margin-bottom: 0; }
+    .table thead th {
+      background: var(--accent);
+      color: #cbd5e1;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      border: none;
+      padding: 0.55rem 1rem;
+    }
+    .table tbody td {
+      padding: 0.6rem 1rem;
+      vertical-align: middle;
+      font-size: 0.85rem;
+      border-color: var(--border);
+    }
+    .table tbody tr:last-child td { border-bottom: none; }
+    .table tbody tr:hover { background: #f8fafc; }
+    .port-num {
+      font-family: 'Courier New', monospace;
+      font-weight: 600;
+      color: var(--accent);
+    }
+    .badge-open {
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.2em 0.7em;
+      border-radius: 20px;
+      letter-spacing: 0.03em;
+    }
+    .banner-text {
+      font-family: 'Courier New', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+    }
+    .vuln-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid transparent;
+      border-radius: 8px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .vuln-card.critical { border-left-color: var(--critical); }
+    .vuln-card.high     { border-left-color: var(--high); }
+    .vuln-card.medium   { border-left-color: var(--medium); }
+    .vuln-card.low      { border-left-color: var(--low); }
+    .vuln-host {
+      font-family: 'Courier New', monospace;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+    .severity-pill {
+      font-size: 0.65rem;
+      font-weight: 600;
+      padding: 0.25em 0.7em;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      white-space: nowrap;
+    }
+    .severity-pill.critical { background: #fee2e2; color: var(--critical); }
+    .severity-pill.high     { background: #ffedd5; color: var(--high); }
+    .severity-pill.medium   { background: #fef3c7; color: var(--medium); }
+    .severity-pill.low      { background: #dbeafe; color: var(--low); }
+    .field-label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 0.2rem;
+    }
+    .rec-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .page-footer {
+      border-top: 1px solid var(--border);
+      padding: 1.25rem 0;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="container">
+    <h1>Network Security Assessment Report</h1>
+    <div class="meta mt-1">Generated: 2026-06-13 19:56:35 &nbsp; | &nbsp; Tool v2.0</div>
+  </div>
+</div>
+
+<div class="container py-4">
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-value">1</div>
+        <div class="stat-label">Hosts Scanned</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-value">3</div>
+        <div class="stat-label">Open Ports</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-value">3</div>
+        <div class="stat-label">Vulnerabilities</div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="stat-card">
+        <div class="stat-value">3.02s</div>
+        <div class="stat-label">Scan Duration</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="risk-banner high mb-4">
+    <div class="d-flex align-items-center flex-wrap gap-3">
+      <div class="risk-cell">
+        <div class="cell-label">Overall Risk</div>
+        <div class="cell-value">High</div>
+      </div>
+      <div class="risk-divider d-none d-md-block"></div>
+      <div class="risk-cell">
+        <div class="cell-label">Avg CVSS</div>
+        <div class="cell-value">5.87</div>
+      </div>
+      <div class="risk-divider d-none d-md-block"></div>
+      <div class="risk-cell">
+        <div class="cell-label">Critical</div>
+        <div class="cell-value">0</div>
+      </div>
+      <div class="risk-cell ms-3">
+        <div class="cell-label">High</div>
+        <div class="cell-value">2</div>
+      </div>
+      <div class="risk-cell ms-3">
+        <div class="cell-label">Medium</div>
+        <div class="cell-value">0</div>
+      </div>
+      <div class="risk-cell ms-3">
+        <div class="cell-label">Low</div>
+        <div class="cell-value">1</div>
+      </div>
+    </div>
+  </div>
+
+  <ul class="nav nav-tabs mb-4" id="reportTabs">
+    <li class="nav-item">
+      <a class="nav-link active" data-bs-toggle="tab" href="#hosts">Discovered Hosts</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#vulns">Vulnerabilities</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" data-bs-toggle="tab" href="#recs">Recommendations</a>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+
+    <div class="tab-pane fade show active" id="hosts">
+      <div class="section-label">Hosts and Open Services</div>
+      
+            <div class="host-block mb-3">
+              <div class="host-title">scanme.nmap.org</div>
+              <table class="table table-sm mb-0">
+                <thead>
+                  <tr>
+                    <th>Port</th><th>Service</th><th>Version</th>
+                    <th>State</th><th>Banner</th>
+                  </tr>
+                </thead>
+                <tbody>
+                <tr>
+                  <td class="port-num">21</td>
+                  <td>ftp</td>
+                  <td>N/A</td>
+                  <td><span class="badge-open">open</span></td>
+                  <td class="banner-text"></td>
+                </tr>
+                <tr>
+                  <td class="port-num">22</td>
+                  <td>ssh</td>
+                  <td>SSH-2.0-OpenSSH_6.6.1p1</td>
+                  <td><span class="badge-open">open</span></td>
+                  <td class="banner-text">SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13</td>
+                </tr>
+                <tr>
+                  <td class="port-num">80</td>
+                  <td>http</td>
+                  <td>Apache/2.4.7 (Ubuntu)</td>
+                  <td><span class="badge-open">open</span></td>
+                  <td class="banner-text">HTTP/1.1 200 OK
+Date: Sat, 13 Jun 2026 14:26:32 GMT
+Server: Apache/2.4.7 (Ubuntu)
+Accep...</td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+    </div>
+
+    <div class="tab-pane fade" id="vulns">
+      <div class="section-label">Findings</div>
+      
+            <div class="vuln-card high mb-3">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="vuln-host">scanme.nmap.org:21 - ftp</span>
+                <span class="severity-pill high">High / CVSS 7.5</span>
+              </div>
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <div class="field-label">Issue</div>
+                  <div>Service uses an unencrypted communication protocol</div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="field-label">Recommendation</div>
+                  <div>Migrate to an encrypted protocol variant (HTTPS, SFTP, etc.)</div>
+                </div>
+              </div>
+            </div>
+            <div class="vuln-card high mb-3">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="vuln-host">scanme.nmap.org:80 - http</span>
+                <span class="severity-pill high">High / CVSS 7.5</span>
+              </div>
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <div class="field-label">Issue</div>
+                  <div>Service uses an unencrypted communication protocol</div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="field-label">Recommendation</div>
+                  <div>Migrate to an encrypted protocol variant (HTTPS, SFTP, etc.)</div>
+                </div>
+              </div>
+            </div>
+            <div class="vuln-card low mb-3">
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <span class="vuln-host">scanme.nmap.org:80 - http</span>
+                <span class="severity-pill low">Low / CVSS 2.6</span>
+              </div>
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <div class="field-label">Issue</div>
+                  <div>HTTP server reveals version information in response headers</div>
+                </div>
+                <div class="col-12 col-md-6">
+                  <div class="field-label">Recommendation</div>
+                  <div>Configure the server to suppress version details in headers</div>
+                </div>
+              </div>
+            </div>
+    </div>
+
+    <div class="tab-pane fade" id="recs">
+      <div class="section-label">Priority Actions</div>
+      <div class="rec-card"><p class="mb-2"><strong>High:</strong> Remediate within 24 to 48 hours.</p></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-footer">
+  <div class="container d-flex justify-content-between flex-wrap gap-2">
+    <span>Network Vulnerability Scanner and Risk Assessment Tool v2.0</span>
+    <span>This report contains sensitive security information. Handle with care.</span>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
