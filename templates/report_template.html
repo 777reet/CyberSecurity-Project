@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AegisScan Security Assessment - scanme.nmap.org</title>
+  <title>AegisScan Security Assessment - {{ metadata.target }}</title>
   <style>
     :root {
       --bg: #090d16;
@@ -73,6 +73,8 @@
     .badge-medium { background: rgba(99, 102, 241, 0.15); color: var(--indigo); border: 1px solid rgba(99, 102, 241, 0.3); }
     .badge-low { background: rgba(16, 185, 129, 0.15); color: var(--emerald); border: 1px solid rgba(16, 185, 129, 0.3); }
     .pill { display: inline-block; padding: 3px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; }
+.secure-text { color: var(--emerald); }
+.insecure-text { color: var(--rose); }
 
     /* Section Cards */
     .section-card {
@@ -142,12 +144,12 @@
     <div class="brand-title">
       <div>
         <h1>AEGIS<span>SCAN</span> // SECURITY AUDIT REPORT</h1>
-        <div class="meta-tag">TARGET: scanme.nmap.org (45.33.32.156) &bull; GENERATED: 2026-09-17 22:21:54</div>
+        <div class="meta-tag">TARGET: {{ metadata.target }} ({{ metadata.resolved_ip }}) &bull; GENERATED: {{ metadata.timestamp }}</div>
       </div>
     </div>
     <div>
-      <span class="pill badge-secure" style="font-size: 14px; padding: 8px 16px;">
-        OVERALL RISK: Secure (CVSS 0.0)
+      <span class="pill badge-{{ risk_summary.overall_risk|lower }}" style="font-size: 14px; padding: 8px 16px;">
+        OVERALL RISK: {{ risk_summary.overall_risk }} (CVSS {{ risk_summary.cvss_average }})
       </span>
     </div>
   </div>
@@ -156,27 +158,27 @@
   <div class="hud-grid">
     <div class="stat-card">
       <div class="label">Total Open Ports</div>
-      <div class="value" style="color: var(--cyan);">1</div>
+      <div class="value" style="color: var(--cyan);">{{ metadata.open_ports_count }}</div>
     </div>
     <div class="stat-card">
       <div class="label">Identified Vulnerabilities</div>
-      <div class="value" style="color: var(--rose);">0</div>
+      <div class="value" style="color: var(--rose);">{{ risk_summary.total_findings }}</div>
     </div>
     <div class="stat-card">
       <div class="label">Critical Findings</div>
-      <div class="value" style="color: var(--rose);">0</div>
+      <div class="value" style="color: var(--rose);">{{ risk_summary.critical }}</div>
     </div>
     <div class="stat-card">
       <div class="label">High Severity</div>
-      <div class="value" style="color: var(--amber);">0</div>
+      <div class="value" style="color: var(--amber);">{{ risk_summary.high }}</div>
     </div>
     <div class="stat-card">
       <div class="label">Medium / Low</div>
-      <div class="value" style="color: var(--indigo);">0</div>
+      <div class="value" style="color: var(--indigo);">{{ risk_summary.medium + risk_summary.low }}</div>
     </div>
     <div class="stat-card">
       <div class="label">Scan Duration</div>
-      <div class="value" style="color: var(--emerald);">40.47s</div>
+      <div class="value" style="color: var(--emerald);">{{ metadata.scan_duration_seconds }}s</div>
     </div>
   </div>
 
@@ -184,7 +186,7 @@
   <div class="section-card">
     <div class="section-header">
       <h2>1. Discovered Ports & Service Fingerprints</h2>
-      <span class="meta-tag">1 Open Ports Discovered</span>
+      <span class="meta-tag">{{ open_ports|length }} Open Ports Discovered</span>
     </div>
     <div class="section-body" style="padding: 0;">
       <table>
@@ -199,17 +201,19 @@
           </tr>
         </thead>
         <tbody>
-          
+          {% for p in open_ports %}
           <tr>
-            <td class="mono" style="font-weight: 700; color: var(--cyan);">22/TCP</td>
+            <td class="mono" style="font-weight: 700; color: var(--cyan);">{{ p.port }}/TCP</td>
             <td><span class="pill badge-low">OPEN</span></td>
-            <td>SSH</td>
-            <td class="mono">2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13</td>
-            <td class="mono">294.42 ms</td>
-            <td class="mono" style="font-size: 11px; color: var(--text-muted);">SSH-2.0-OpenSSH_6.6.1p1 Ubuntu-2ubuntu2.13</td>
+            <td>{{ p.service }}</td>
+            <td class="mono">{{ p.version }}</td>
+            <td class="mono">{{ p.latency_ms }} ms</td>
+            <td class="mono" style="font-size: 11px; color: var(--text-muted);">{{ p.banner if p.banner else 'N/A' }}</td>
           </tr>
-          
-          
+          {% endfor %}
+          {% if not open_ports %}
+          <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No open TCP ports discovered on this host.</td></tr>
+          {% endif %}
         </tbody>
       </table>
     </div>
@@ -219,7 +223,7 @@
   <div class="section-card">
     <div class="section-header">
       <h2>2. Quantitative Vulnerability Assessment (CVSS v3.1)</h2>
-      <span class="meta-tag">0 Security Findings</span>
+      <span class="meta-tag">{{ vulnerabilities|length }} Security Findings</span>
     </div>
     <div class="section-body" style="padding: 0;">
       <table>
@@ -233,23 +237,95 @@
           </tr>
         </thead>
         <tbody>
-          
-          
+          {% for v in vulnerabilities %}
+          <tr>
+            <td><span class="pill badge-{{ v.severity|lower }}">{{ v.severity }}</span></td>
+            <td class="mono" style="font-weight: 700;">{{ v.cvss_score }}</td>
+            <td>
+              <strong>{{ v.title }}</strong>
+              <div style="font-size: 12px; color: var(--text-muted); margin-top: 4px;">{{ v.description }}</div>
+            </td>
+            <td class="mono" style="font-size: 11px; color: var(--text-muted);">{{ v.vector_string if v.vector_string else 'N/A' }}</td>
+            <td style="font-size: 12px; color: #38bdf8;">{{ v.recommendation }}</td>
+          </tr>
+          {% endfor %}
+          {% if not vulnerabilities %}
           <tr><td colspan="5" style="text-align: center; color: var(--emerald);">Zero security vulnerabilities detected. Target posture is hardened.</td></tr>
-          
+          {% endif %}
         </tbody>
       </table>
     </div>
   </div>
 
   <!-- SSL/TLS Cryptographic Deep-Dive -->
-  
+  {% if ssl_audit and ssl_audit.enabled %}
+  <div class="section-card">
+    <div class="section-header">
+      <h2>3. SSL/TLS Cryptographic Security Inspection</h2>
+      <span class="meta-tag">Port {{ ssl_audit.port }} &bull; {{ ssl_audit.protocol_version }}</span>
+    </div>
+    <div class="section-body">
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px;">
+        <div>
+          <div class="meta-tag">CERTIFICATE COMMON NAME</div>
+          <div style="font-weight: 600; margin-top: 4px;">{{ ssl_audit.certificate.common_name }}</div>
+          <div class="meta-tag" style="margin-top: 10px;">ISSUER</div>
+          <div>{{ ssl_audit.certificate.issuer_common_name }} ({{ ssl_audit.certificate.issuer_organization }})</div>
+        </div>
+        <div>
+          <div class="meta-tag">EXPIRATION STATUS</div>
+          <div style="font-weight: 600; margin-top: 4px;">{{ ssl_audit.certificate.valid_to }}</div>
+          <div style="color: var(--emerald); font-size: 12px; margin-top: 2px;">{{ ssl_audit.days_until_expiration }} days remaining</div>
+        </div>
+        <div>
+          <div class="meta-tag">NEGOTIATED CIPHER SUITE</div>
+          <div class="mono" style="font-size: 12px; margin-top: 4px;">{{ ssl_audit.cipher_suite }}</div>
+          <div style="font-size: 12px; color: var(--cyan); margin-top: 2px;">{{ ssl_audit.cipher_bits }} bit &bull; {{ 'PFS Enabled' if ssl_audit.has_pfs else 'No PFS' }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 
   <!-- OWASP Web Application Security -->
-  
+  {% if web_audit and web_audit.is_web %}
+  <div class="section-card">
+    <div class="section-header">
+      <h2>4. OWASP Web Application & Header Security Scorecard</h2>
+      <span class="meta-tag">{{ web_audit.url }} &bull; HTTP {{ web_audit.status_code }}</span>
+    </div>
+    <div class="section-body">
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+        <div>
+          <h4 style="font-size: 13px; color: var(--emerald); margin-bottom: 10px;">Configured Security Headers ({{ web_audit.present_headers|length }})</h4>
+          <ul style="list-style: none;">
+            {% for h in web_audit.present_headers %}
+            <li style="padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px;">
+              <span class="mono" style="font-weight: 600; color: #fff;">{{ h.name }}:</span> <span class="mono" style="color: var(--text-muted);">{{ h.value[:60] }}...</span>
+            </li>
+            {% endfor %}
+            {% if not web_audit.present_headers %}
+            <li style="color: var(--rose); font-size: 12px;">None of the recommended OWASP security headers were found.</li>
+            {% endif %}
+          </ul>
+        </div>
+        <div>
+          <h4 style="font-size: 13px; color: var(--rose); margin-bottom: 10px;">Missing Defensive Headers ({{ web_audit.missing_headers|length }})</h4>
+          <ul style="list-style: none;">
+            {% for mh in web_audit.missing_headers %}
+            <li style="padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 12px; color: var(--rose);">
+              &bull; {{ mh }}
+            </li>
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% endif %}
 
   <!-- DNS & Email Spoofing Defense -->
-  
+  {% if dns_audit and not dns_audit.is_ip %}
   <div class="section-card">
     <div class="section-header">
       <h2>5. DNS Reconnaissance & Anti-Phishing Spoofing Defense</h2>
@@ -259,24 +335,28 @@
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
         <div style="background: var(--surface-card); padding: 14px; border-radius: 8px; border: 1px solid var(--border);">
           <div class="meta-tag">SENDER POLICY FRAMEWORK (SPF)</div>
-          <div style="font-size: 15px; font-weight: 700; margin-top: 4px; color: var(--rose);">
-            Missing
+          <div class="{{ 'secure-text' if dns_audit.spf.is_secure else 'insecure-text' }}" style="font-size: 15px; font-weight: 700; margin-top: 4px;">
+            {{ dns_audit.spf.mechanism }}
           </div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">No SPF record found.</div>
-          
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">{{ dns_audit.spf.details }}</div>
+          {% if dns_audit.spf.record %}
+          <pre>{{ dns_audit.spf.record }}</pre>
+          {% endif %}
         </div>
         <div style="background: var(--surface-card); padding: 14px; border-radius: 8px; border: 1px solid var(--border);">
           <div class="meta-tag">DMARC POLICY (_dmarc)</div>
-          <div style="font-size: 15px; font-weight: 700; margin-top: 4px; color: var(--rose);">
-            Missing
+          <div class="{{ 'secure-text' if dns_audit.dmarc.is_secure else 'insecure-text' }}" style="font-size: 15px; font-weight: 700; margin-top: 4px;">
+            {{ dns_audit.dmarc.policy }}
           </div>
-          <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">No DMARC record found at _dmarc.</div>
-          
+          <div style="font-size: 12px; color: var(--text-muted); margin-top: 6px;">{{ dns_audit.dmarc.details }}</div>
+          {% if dns_audit.dmarc.record %}
+          <pre>{{ dns_audit.dmarc.record }}</pre>
+          {% endif %}
         </div>
       </div>
     </div>
   </div>
-  
+  {% endif %}
 
   <!-- Actionable Remediation Playbooks -->
   <div class="section-card">
@@ -285,30 +365,30 @@
       <span class="meta-tag">Production-Ready Fixes</span>
     </div>
     <div class="section-body">
-      
+      {% for rem in remediations %}
       <div style="margin-bottom: 20px;">
-        <h3 style="font-size: 14px; color: var(--cyan); margin-bottom: 6px;">&gt; Email Spoofing & Phishing Defense (SPF & DMARC)</h3>
-        
-        
-        
-        
+        <h3 style="font-size: 14px; color: var(--cyan); margin-bottom: 6px;">&gt; {{ rem.title }}</h3>
+        {% if rem.nginx %}
+        <div class="meta-tag">NGINX HARDENING DIRECTIVES</div>
+        <pre>{{ rem.nginx }}</pre>
+        {% endif %}
+        {% if rem.apache %}
+        <div class="meta-tag" style="margin-top: 8px;">APACHE DIRECTIVES</div>
+        <pre>{{ rem.apache }}</pre>
+        {% endif %}
+        {% if rem.iptables %}
+        <div class="meta-tag">IPTABLES FIREWALL RULE</div>
+        <pre>{{ rem.iptables }}</pre>
+        {% endif %}
+        {% if rem.dns_records %}
         <div class="meta-tag">RECOMMENDED DNS RESOURCE RECORDS</div>
-        <pre># Recommended DNS Resource Records for scanme.nmap.org
-
-1. Strict SPF Record (Prevents Unauthorized Sending Servers):
-   Host: @
-   Type: TXT
-   Value: v=spf1 mx -all
-
-2. Strict DMARC Policy (Instructs Receivers to Reject Spoofed Emails):
-   Host: _dmarc
-   Type: TXT
-   Value: v=DMARC1; p=reject; pct=100; rua=mailto:security-dmarc@scanme.nmap.org
-</pre>
-        
+        <pre>{{ rem.dns_records }}</pre>
+        {% endif %}
       </div>
-      
-      
+      {% endfor %}
+      {% if not remediations %}
+      <p style="color: var(--emerald);">No configuration remediations required. All assessed controls satisfy baseline security standards.</p>
+      {% endif %}
     </div>
   </div>
 
