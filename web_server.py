@@ -19,6 +19,7 @@ from socketserver import ThreadingMixIn
 from typing import Dict, Any, Optional
 
 from core.engine import run_full_assessment
+from core.recon_intel import run_recon_intelligence, grade_http_headers, lookup_whois_geo, enumerate_subdomains, get_cert_transparency_log, fingerprint_technologies
 
 try:
     from jinja2 import Template
@@ -84,7 +85,47 @@ class AegisWebHandler(SimpleHTTPRequestHandler):
                     break
             return
 
-        # 2. API: Export Data
+        # 2. API: Threat Intelligence / Recon
+        elif path == "/api/intel":
+            target = query.get("target", [None])[0]
+            module = query.get("module", ["all"])[0]
+            web_port = int(query.get("port", ["443"])[0])
+
+            if not target:
+                self.send_error(400, "target parameter is required")
+                return
+
+            try:
+                if module == "headers":
+                    data = grade_http_headers(target, port=web_port, timeout=8.0)
+                elif module == "geo":
+                    data = lookup_whois_geo(target, timeout=8.0)
+                elif module == "subdomains":
+                    data = enumerate_subdomains(target, timeout=12.0)
+                elif module == "certs":
+                    data = get_cert_transparency_log(target, timeout=12.0)
+                elif module == "tech":
+                    data = fingerprint_technologies(target, port=web_port, timeout=8.0)
+                else:
+                    data = run_recon_intelligence(target, web_port=web_port, timeout=10.0)
+
+                resp_data = json.dumps(data).encode("utf-8")
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Access-Control-Allow-Origin", "*")
+                self.send_header("Content-Length", str(len(resp_data)))
+                self.end_headers()
+                self.wfile.write(resp_data)
+            except Exception as e:
+                err = json.dumps({"error": str(e)}).encode("utf-8")
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json")
+                self.send_header("Content-Length", str(len(err)))
+                self.end_headers()
+                self.wfile.write(err)
+            return
+
+        # 3. API: Export Data
         elif path == "/api/export":
             global LATEST_SCAN_RESULT
             if not LATEST_SCAN_RESULT:
@@ -239,7 +280,7 @@ class AegisWebHandler(SimpleHTTPRequestHandler):
         self.send_error(404, "Unknown endpoint")
 
 
-def start_server(host: str = "127.0.0.1", port: int = 5000):
+def start_server(host: str = "127.0.0.1", port: int = 5050):
     """Starts the AegisScan Web Console server."""
     server_address = (host, port)
     httpd = ThreadedHTTPServer(server_address, AegisWebHandler)

@@ -3,292 +3,694 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AegisScan // Autonomous Cyber Reconnaissance & Risk Assessment Platform</title>
+  <title>AegisScan — Cybersecurity Assessment Platform</title>
+  <meta name="description" content="Autonomous multi-vector network and web security assessment platform with real-time CVE correlation, DNS audit, SSL/TLS analysis, and threat intelligence.">
   <link rel="stylesheet" href="/style.css">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
 
-<div class="app-layout">
-  
-  <!-- Navigation Header -->
-  <header class="top-nav">
-    <div class="nav-brand">
-      <div class="brand-emblem-wrapper">
-        <img src="/assets/aegis_emblem.jpg" alt="Aegis Logo" class="brand-emblem">
-        <div class="radar-ping"></div>
+<div class="shell">
+
+  <!-- =====================================================================
+       Sidebar Navigation
+       ===================================================================== -->
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+        </svg>
       </div>
-      <div class="brand-text">
-        <div class="brand-title">AEGIS<span>SCAN</span> <span class="version-tag">v3.0 PRO</span></div>
-        <div class="brand-subtitle">Autonomous Multi-Vector Reconnaissance & Vulnerability Assessment</div>
+      <div>
+        <div class="brand-name">AegisScan</div>
+        <div class="brand-version">v3.1</div>
       </div>
     </div>
 
-    <div class="nav-status">
-      <div class="system-indicator">
-        <span class="pulse-dot idle" id="systemPulse"></span>
-        <span class="status-label" id="systemStatusText">CONSOLE READY</span>
-      </div>
-      <button class="btn btn-outline" id="btnExportMenu" style="display:none;">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Export Audit
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Assessment</div>
+
+      <button class="nav-item active" data-page="pageOverview">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+          <rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        Overview
+      </button>
+
+      <button class="nav-item" data-page="pagePorts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="3"/><path d="M12 2v7m0 6v7M2 12h7m6 0h7"/>
+        </svg>
+        Ports & Services
+        <span class="nav-badge" id="badgePorts">0</span>
+      </button>
+
+      <button class="nav-item" data-page="pageVulns">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+          <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+        </svg>
+        Vulnerabilities
+        <span class="nav-badge" id="badgeVulns">0</span>
+      </button>
+
+      <button class="nav-item" data-page="pageTopology">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/>
+          <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        Attack Surface
       </button>
     </div>
-  </header>
 
-  <!-- Target Configuration Command Bar -->
-  <section class="command-bar">
-    <form id="scanForm" class="scan-form">
-      <div class="input-group target-input-group">
-        <label for="targetInput">TARGET HOST / IP / DOMAIN</label>
-        <div class="input-with-icon">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 9.17 4.24-4.24"/><path d="m14.83 14.83 4.24 4.24"/><path d="m9.17 14.83-4.24 4.24"/></svg>
-          <input type="text" id="targetInput" placeholder="e.g. 127.0.0.1, scanme.nmap.org, example.com" value="scanme.nmap.org" required>
-        </div>
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Analysis</div>
+
+      <button class="nav-item" data-page="pageWeb">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="2" y1="12" x2="22" y2="12"/>
+          <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        Web Audit
+      </button>
+
+      <button class="nav-item" data-page="pageSSL">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        SSL / TLS
+      </button>
+
+      <button class="nav-item" data-page="pageDNS">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07"/>
+          <path d="M11 5H6a2 2 0 0 0-2 2v11a2 2 0 0 0 2 2h11a2 2 0 0 0 2-2v-5"/>
+          <polyline points="11 2 11 8 14 5"/>
+        </svg>
+        DNS & Email
+      </button>
+
+      <button class="nav-item" data-page="pagePlaybooks">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="16" y1="13" x2="8" y2="13"/>
+          <line x1="16" y1="17" x2="8" y2="17"/>
+          <polyline points="10 9 9 9 8 9"/>
+        </svg>
+        Remediation
+      </button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <div class="sidebar-section-title">Intelligence</div>
+
+      <button class="nav-item" data-page="pageHeaders">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+        </svg>
+        Header Grader
+      </button>
+
+      <button class="nav-item" data-page="pageGeo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+        </svg>
+        WHOIS & Geo
+      </button>
+
+      <button class="nav-item" data-page="pageTech">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+        </svg>
+        Tech Fingerprint
+      </button>
+
+      <button class="nav-item" data-page="pageSubdomains">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+          <circle cx="12" cy="10" r="3"/>
+        </svg>
+        Subdomains
+        <span class="nav-badge" id="badgeSubdomains">—</span>
+      </button>
+
+      <button class="nav-item" data-page="pageCerts">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+          <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        Cert Transparency
+      </button>
+    </div>
+
+    <div class="sidebar-divider"></div>
+
+    <div class="sidebar-section">
+      <button class="nav-item" data-page="pageTerminal">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+        </svg>
+        Live Log
+      </button>
+    </div>
+
+    <div class="sidebar-status">
+      <div class="status-row">
+        <div class="status-dot" id="sidebarDot"></div>
+        <span id="sidebarStatus">Ready</span>
       </div>
+    </div>
+  </nav>
 
-      <div class="input-group profile-input-group">
-        <label for="profileSelect">RECON PROFILE</label>
-        <select id="profileSelect">
-          <option value="quick" selected>Quick Triage (Top 20 Ports)</option>
-          <option value="web">Web & Cloud Services</option>
-          <option value="databases">Databases & Caches</option>
-          <option value="infrastructure">Infrastructure & Management</option>
-          <option value="standard">Full Standard (Top 100 Ports)</option>
-          <option value="custom">Custom Port Range...</option>
+  <!-- =====================================================================
+       Main Content
+       ===================================================================== -->
+  <div class="main">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <svg class="target-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/><path d="m4.93 4.93 4.24 4.24m9.9 0-4.24 4.24m0 5.66 4.24 4.24m-14.14 0 4.24-4.24"/>
+      </svg>
+
+      <form id="scanForm" class="target-form">
+        <input type="text" id="targetInput" class="target-input" placeholder="Enter target: domain, IP, or hostname..." value="scanme.nmap.org" autocomplete="off" spellcheck="false">
+
+        <div class="topbar-divider"></div>
+
+        <select id="profileSelect" class="topbar-select">
+          <option value="quick">Quick Scan (Top 17)</option>
+          <option value="web">Web & Cloud</option>
+          <option value="databases">Databases</option>
+          <option value="infrastructure">Infrastructure</option>
+          <option value="standard">Full Standard (100+)</option>
+          <option value="custom">Custom Range...</option>
         </select>
-      </div>
 
-      <div class="input-group custom-ports-group" id="customPortsWrapper" style="display:none;">
-        <label for="customPortsInput">CUSTOM PORTS</label>
-        <input type="text" id="customPortsInput" placeholder="e.g. 80,443,8080 or 1-1000">
-      </div>
+        <div id="customPortsWrap" class="custom-ports-wrap" style="display:none;">
+          <input type="text" id="customPortsInput" class="custom-ports-input" placeholder="80,443,8080 or 1-1000">
+        </div>
 
-      <div class="input-group threads-group">
-        <label for="threadsRange">WORKERS: <span id="threadsValue">50</span></label>
+        <div class="topbar-divider"></div>
+
+        <span class="workers-label">Workers: <span id="workersVal">50</span></span>
         <input type="range" id="threadsRange" min="10" max="100" value="50" step="10">
-      </div>
 
-      <button type="submit" class="btn btn-primary" id="btnLaunchScan">
-        <span class="btn-radar-icon"></span>
-        <span id="btnLaunchText">EXECUTE AUDIT</span>
-      </button>
-    </form>
+        <div class="topbar-divider"></div>
 
-    <!-- Scan Progress Bar -->
-    <div class="progress-bar-container" id="progressBarContainer" style="display:none;">
-      <div class="progress-bar-fill" id="progressBarFill" style="width: 0%;"></div>
-      <div class="progress-bar-meta">
-        <span id="progressStatusText">Initializing reconnaissance engine...</span>
-        <span id="progressPercentageText">0%</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- Main Security Dashboard HUD -->
-  <main class="dashboard-grid">
-
-    <!-- Executive HUD Top Row -->
-    <section class="hud-metrics-row">
-      <!-- CVSS Risk Dial -->
-      <div class="hud-card risk-gauge-card">
-        <div class="card-tag">EXECUTIVE RISK RATING</div>
-        <div class="gauge-wrapper">
-          <svg class="gauge-svg" viewBox="0 0 160 160">
-            <circle class="gauge-bg" cx="80" cy="80" r="68"></circle>
-            <circle class="gauge-meter" id="gaugeMeter" cx="80" cy="80" r="68"></circle>
+        <button type="submit" class="btn-scan" id="btnScan">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <polygon points="5 3 19 12 5 21 5 3"/>
           </svg>
-          <div class="gauge-center-text">
-            <div class="gauge-score" id="gaugeScore">0.0</div>
-            <div class="gauge-tier" id="gaugeTier">SECURE</div>
+          <span id="btnScanText">Run Scan</span>
+        </button>
+      </form>
+
+      <!-- Export -->
+      <div class="export-wrapper" id="exportWrapper" style="display:none;">
+        <button class="btn-icon" id="btnExportToggle" title="Export results">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+        </button>
+        <div class="export-menu" id="exportMenu">
+          <button class="export-option" onclick="exportReport('html')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+            HTML Report
+          </button>
+          <button class="export-option" onclick="exportReport('json')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+            </svg>
+            JSON Export
+          </button>
+          <button class="export-option" onclick="exportReport('csv')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <line x1="8" y1="13" x2="16" y2="13"/>
+              <line x1="8" y1="17" x2="16" y2="17"/>
+              <polyline points="10 9 9 9 8 9"/>
+            </svg>
+            CSV (Ports)
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Progress -->
+    <div class="progress-strip"><div class="progress-strip-fill" id="progressFill"></div></div>
+    <div class="progress-msg" id="progressMsg"></div>
+
+    <!-- Pages -->
+    <div class="page-container">
+
+      <!-- ===== OVERVIEW PAGE ===== -->
+      <div class="page active" id="pageOverview">
+        <div class="overview-grid">
+          <div class="metric-card risk-card">
+            <div class="metric-label">Risk Level</div>
+            <div class="metric-value" id="riskScore" style="font-size:38px;">—</div>
+            <div id="riskBadge" class="risk-badge secure">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              <span id="riskLabel">SECURE</span>
+            </div>
+            <div class="metric-sub" id="cvssAvgLabel" style="margin-top:6px;">CVSS avg: —</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Findings</div>
+            <div class="metric-value" id="totalFindings">0</div>
+            <div class="metric-sub">vulnerabilities found</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Open Ports</div>
+            <div class="metric-value" id="openPortsCount">0</div>
+            <div class="metric-sub">services exposed</div>
+          </div>
+
+          <div class="metric-card">
+            <div class="metric-label">Scan Duration</div>
+            <div class="metric-value" id="scanDuration" style="font-size:20px;">—</div>
+            <div class="metric-sub" id="scanTimestamp">not run yet</div>
           </div>
         </div>
-        <div class="gauge-footer">NIST CVSS v3.1 BASE AVERAGE</div>
-      </div>
 
-      <!-- Severity Breakdown -->
-      <div class="hud-card stat-tile critical-tile">
-        <div class="tile-header">
-          <span class="tile-label">CRITICAL SEVERITY</span>
-          <span class="tile-dot"></span>
-        </div>
-        <div class="tile-number" id="countCritical">0</div>
-        <div class="tile-hint">Immediate remediation required</div>
-      </div>
-
-      <div class="hud-card stat-tile high-tile">
-        <div class="tile-header">
-          <span class="tile-label">HIGH SEVERITY</span>
-          <span class="tile-dot"></span>
-        </div>
-        <div class="tile-number" id="countHigh">0</div>
-        <div class="tile-hint">Remediate within 24–48 hours</div>
-      </div>
-
-      <div class="hud-card stat-tile medium-tile">
-        <div class="tile-header">
-          <span class="tile-label">MEDIUM SEVERITY</span>
-          <span class="tile-dot"></span>
-        </div>
-        <div class="tile-number" id="countMedium">0</div>
-        <div class="tile-hint">Schedule in sprint cycle</div>
-      </div>
-
-      <div class="hud-card stat-tile telemetry-tile">
-        <div class="tile-header">
-          <span class="tile-label">TELEMETRY & TARGET</span>
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-        </div>
-        <div class="telemetry-info">
-          <div><span>Target IP:</span> <strong id="telemetryIp" class="mono">--</strong></div>
-          <div><span>Open Ports:</span> <strong id="telemetryOpenPorts" class="mono">0</strong></div>
-          <div><span>Scan Time:</span> <strong id="telemetryDuration" class="mono">--</strong></div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Interactive Attack Surface Network Topology Graph -->
-    <section class="topology-section">
-      <div class="section-banner">
-        <div class="banner-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v7m0 6v7M2 12h7m6 0h7"/></svg>
-          <h3>ATTACK SURFACE TOPOLOGY // INTERACTIVE GRAPH</h3>
-        </div>
-        <div class="topology-legend">
-          <span class="legend-item"><span class="dot dot-target"></span> Target Host</span>
-          <span class="legend-item"><span class="dot dot-port"></span> Open Port</span>
-          <span class="legend-item"><span class="dot dot-vuln"></span> Vulnerability</span>
-          <button class="btn btn-sm" id="btnResetTopology">Reset Graph</button>
-        </div>
-      </div>
-      <div class="canvas-container">
-        <canvas id="topologyCanvas"></canvas>
-        <div class="canvas-overlay-hint" id="canvasHint">Interactive Graph: Drag nodes to rearrange &bull; Scroll to zoom</div>
-      </div>
-    </section>
-
-    <!-- Assessment Tabs -->
-    <section class="assessment-section">
-      <nav class="tab-nav">
-        <button class="tab-btn active" data-tab="tabPorts">
-          <span class="tab-icon">&#9881;</span> Open Ports & Services (<span id="tabCountPorts">0</span>)
-        </button>
-        <button class="tab-btn" data-tab="tabWeb">
-          <span class="tab-icon">&#127760;</span> OWASP Web Audit
-        </button>
-        <button class="tab-btn" data-tab="tabCrypto">
-          <span class="tab-icon">&#128274;</span> SSL/TLS Cryptography
-        </button>
-        <button class="tab-btn" data-tab="tabDns">
-          <span class="tab-icon">&#128225;</span> DNS & Spoofing Defense
-        </button>
-        <button class="tab-btn" data-tab="tabVulns">
-          <span class="tab-icon">&#9888;</span> Vulnerabilities & CVSS (<span id="tabCountVulns">0</span>)
-        </button>
-        <button class="tab-btn" data-tab="tabPlaybooks">
-          <span class="tab-icon">&#128196;</span> Remediation Playbooks
-        </button>
-        <button class="tab-btn" data-tab="tabTerminal">
-          <span class="tab-icon">&#62;_</span> Live Terminal Log
-        </button>
-      </nav>
-
-      <!-- Tab 1: Ports -->
-      <div class="tab-content active" id="tabPorts">
-        <div class="table-responsive">
-          <table class="data-table" id="portsTable">
-            <thead>
-              <tr>
-                <th>Port</th>
-                <th>State</th>
-                <th>Service Name</th>
-                <th>Version / Banner Info</th>
-                <th>Latency</th>
-                <th>Raw Socket Banner</th>
-              </tr>
-            </thead>
-            <tbody id="portsTableBody">
-              <tr><td colspan="6" class="empty-state">No scan executed yet. Select a target above and click 'EXECUTE AUDIT'.</td></tr>
-            </tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- Tab 2: OWASP Web Audit -->
-      <div class="tab-content" id="tabWeb">
-        <div id="webAuditContainer">
-          <div class="empty-state">Web security assessment will be populated once target HTTP/HTTPS ports are audited.</div>
-        </div>
-      </div>
-
-      <!-- Tab 3: SSL/TLS Cryptography -->
-      <div class="tab-content" id="tabCrypto">
-        <div id="cryptoAuditContainer">
-          <div class="empty-state">Cryptographic certificate and cipher assessment will be displayed here for TLS/HTTPS targets.</div>
-        </div>
-      </div>
-
-      <!-- Tab 4: DNS & Spoofing Defense -->
-      <div class="tab-content" id="tabDns">
-        <div id="dnsAuditContainer">
-          <div class="empty-state">DNS resource records and SPF/DMARC anti-spoofing policy analysis will appear here.</div>
-        </div>
-      </div>
-
-      <!-- Tab 5: Vulnerabilities -->
-      <div class="tab-content" id="tabVulns">
-        <div class="filter-toolbar">
-          <input type="text" id="vulnFilterInput" placeholder="Filter findings by keyword, port, or severity..." class="filter-input">
-          <div class="filter-pills" id="severityFilterPills">
-            <button class="pill-btn active" data-sev="ALL">All Findings</button>
-            <button class="pill-btn" data-sev="Critical">Critical</button>
-            <button class="pill-btn" data-sev="High">High</button>
-            <button class="pill-btn" data-sev="Medium">Medium</button>
-            <button class="pill-btn" data-sev="Low">Low</button>
+        <!-- Severity breakdown -->
+        <div class="sev-grid">
+          <div class="sev-card">
+            <div class="sev-dot critical"></div>
+            <div class="sev-info">
+              <div class="sev-count" id="sevCritical">0</div>
+              <div class="sev-name">Critical</div>
+            </div>
+          </div>
+          <div class="sev-card">
+            <div class="sev-dot high"></div>
+            <div class="sev-info">
+              <div class="sev-count" id="sevHigh">0</div>
+              <div class="sev-name">High</div>
+            </div>
+          </div>
+          <div class="sev-card">
+            <div class="sev-dot medium"></div>
+            <div class="sev-info">
+              <div class="sev-count" id="sevMedium">0</div>
+              <div class="sev-name">Medium</div>
+            </div>
+          </div>
+          <div class="sev-card">
+            <div class="sev-dot low"></div>
+            <div class="sev-info">
+              <div class="sev-count" id="sevLow">0</div>
+              <div class="sev-name">Low</div>
+            </div>
           </div>
         </div>
-        <div class="vuln-cards-list" id="vulnCardsList">
-          <div class="empty-state">No vulnerabilities detected yet.</div>
-        </div>
-      </div>
 
-      <!-- Tab 6: Remediation Playbooks -->
-      <div class="tab-content" id="tabPlaybooks">
-        <div id="playbooksContainer">
-          <div class="empty-state">Hardening code templates will be dynamically generated once vulnerabilities are identified.</div>
-        </div>
-      </div>
-
-      <!-- Tab 7: Terminal Log -->
-      <div class="tab-content" id="tabTerminal">
-        <div class="terminal-box">
-          <div class="terminal-header">
-            <span class="terminal-title">LIVE SOCKET EVENT STREAM</span>
-            <button class="btn btn-xs" id="btnClearTerminal">Clear Log</button>
+        <!-- Telemetry -->
+        <div class="tele-row">
+          <div class="tele-card">
+            <div class="tele-label">Target</div>
+            <div class="tele-value mono" id="teleTarget">—</div>
           </div>
-          <div class="terminal-body mono" id="terminalBody">
-            <div class="log-line info">[SYSTEM] AegisScan v3.0 Pro initialized and listening.</div>
-            <div class="log-line info">[SYSTEM] Ready to assess user targets.</div>
+          <div class="tele-card">
+            <div class="tele-label">Resolved IP</div>
+            <div class="tele-value mono" id="teleIP">—</div>
+          </div>
+          <div class="tele-card">
+            <div class="tele-label">Engine</div>
+            <div class="tele-value mono" id="teleEngine">AegisScan v3.1</div>
+          </div>
+        </div>
+
+        <div class="card" id="overviewEmpty">
+          <div class="card-body">
+            <div class="empty-state">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+              <div>No scan results yet</div>
+              <div style="font-size:12px;">Enter a target in the top bar and click <strong>Run Scan</strong></div>
+            </div>
           </div>
         </div>
       </div>
 
-    </section>
+      <!-- ===== PORTS PAGE ===== -->
+      <div class="page" id="pagePorts">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3"/><path d="M12 2v7m0 6v7M2 12h7m6 0h7"/>
+              </svg>
+              Open Ports & Services
+            </div>
+            <span class="card-count" id="portsCount">0 ports</span>
+          </div>
+          <div class="tbl-wrap">
+            <table class="data-table" id="portsTable">
+              <thead>
+                <tr>
+                  <th>Port</th>
+                  <th>State</th>
+                  <th>Service</th>
+                  <th>Version / Banner</th>
+                  <th>Latency</th>
+                  <th>Risk Note</th>
+                </tr>
+              </thead>
+              <tbody id="portsTableBody">
+                <tr><td colspan="6"><div class="empty-state">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2v7m0 6v7M2 12h7m6 0h7"/></svg>
+                  Run a scan to see discovered ports
+                </div></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-  </main>
+      <!-- ===== VULNERABILITIES PAGE ===== -->
+      <div class="page" id="pageVulns">
+        <div class="card">
+          <div class="filter-bar">
+            <input type="text" id="vulnSearch" class="filter-input" placeholder="Search by title, severity, port...">
+            <div class="filter-pills">
+              <button class="pill active" data-sev="ALL">All</button>
+              <button class="pill" data-sev="Critical">Critical</button>
+              <button class="pill" data-sev="High">High</button>
+              <button class="pill" data-sev="Medium">Medium</button>
+              <button class="pill" data-sev="Low">Low</button>
+            </div>
+          </div>
+          <div class="vuln-list" id="vulnList">
+            <div class="empty-state" style="padding:40px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              No vulnerabilities detected yet
+            </div>
+          </div>
+        </div>
+      </div>
 
-  <!-- Footer -->
-  <footer class="app-footer">
-    <div>AegisScan: Autonomous Network & Web Cybersecurity Platform &bull; Final Year Capstone Project</div>
-    <div class="mono">CVSS v3.1 Compliant &bull; Zero Hardcoded Data &bull; Real-Time Socket Assessment</div>
-  </footer>
+      <!-- ===== TOPOLOGY PAGE ===== -->
+      <div class="page" id="pageTopology">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+              </svg>
+              Attack Surface Network Graph
+            </div>
+            <button class="btn-sm" id="btnResetGraph">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4"/>
+              </svg>
+              Reset
+            </button>
+          </div>
+          <div class="topology-wrap">
+            <canvas id="topologyCanvas"></canvas>
+            <div class="topology-legend">
+              <span><span class="legend-dot target"></span>Target</span>
+              <span><span class="legend-dot port"></span>Open Port</span>
+              <span><span class="legend-dot vuln"></span>Vulnerability</span>
+            </div>
+            <div class="topology-hint">Drag to reposition · Scroll to zoom</div>
+          </div>
+        </div>
+      </div>
 
-</div>
+      <!-- ===== WEB AUDIT PAGE ===== -->
+      <div class="page" id="pageWeb">
+        <div class="card" id="webAuditCard">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+              OWASP Web Security Assessment
+            </div>
+          </div>
+          <div id="webAuditContent">
+            <div class="empty-state" style="padding:40px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+              Web audit results will appear here after scanning a target with HTTP/HTTPS ports open.
+            </div>
+          </div>
+        </div>
+      </div>
 
-<!-- Toast Notifications -->
-<div class="toast-container" id="toastContainer"></div>
+      <!-- ===== SSL PAGE ===== -->
+      <div class="page" id="pageSSL">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              SSL / TLS Cryptographic Audit
+            </div>
+          </div>
+          <div id="sslContent">
+            <div class="empty-state" style="padding:40px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+              </svg>
+              SSL/TLS analysis will appear for targets with port 443 or 8443 open.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== DNS PAGE ===== -->
+      <div class="page" id="pageDNS">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07"/>
+              </svg>
+              DNS Records & Email Spoofing Defense
+            </div>
+          </div>
+          <div id="dnsContent">
+            <div class="empty-state" style="padding:40px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07"/>
+              </svg>
+              DNS and email spoofing analysis will appear after a scan.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== PLAYBOOKS PAGE ===== -->
+      <div class="page" id="pagePlaybooks">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14 2 14 8 20 8"/>
+              </svg>
+              Remediation Playbooks
+            </div>
+          </div>
+          <div id="playbooksContent">
+            <div class="empty-state" style="padding:40px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              </svg>
+              Hardening templates will be generated after vulnerabilities are found.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== HEADER GRADER PAGE ===== -->
+      <div class="page" id="pageHeaders">
+        <div class="card">
+          <div class="intel-run-bar">
+            <div class="desc">Grade the HTTP security headers for any web target (independent of port scan)</div>
+            <button class="btn-intel" id="btnRunHeaders">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+              Grade Headers
+            </button>
+          </div>
+          <div id="headersContent">
+            <div class="empty-state" style="padding:40px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+              </svg>
+              Click "Grade Headers" to analyse the HTTP security headers for the target in the scanbar.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== WHOIS / GEO PAGE ===== -->
+      <div class="page" id="pageGeo">
+        <div class="card">
+          <div class="intel-run-bar">
+            <div class="desc">IP geolocation, ASN lookup, and RDAP WHOIS registration data</div>
+            <button class="btn-intel" id="btnRunGeo">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+              </svg>
+              Lookup WHOIS / Geo
+            </button>
+          </div>
+          <div id="geoContent">
+            <div class="empty-state" style="padding:40px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+              </svg>
+              Click "Lookup WHOIS / Geo" to retrieve geolocation and registration data.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TECH FINGERPRINT PAGE ===== -->
+      <div class="page" id="pageTech">
+        <div class="card">
+          <div class="intel-run-bar">
+            <div class="desc">Identify CMS, WAF, CDN, framework, and web server technology from HTTP signatures</div>
+            <button class="btn-intel" id="btnRunTech">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+              </svg>
+              Fingerprint Tech Stack
+            </button>
+          </div>
+          <div id="techContent">
+            <div class="empty-state" style="padding:40px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+              </svg>
+              Click "Fingerprint Tech Stack" to detect technologies in use.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SUBDOMAINS PAGE ===== -->
+      <div class="page" id="pageSubdomains">
+        <div class="card">
+          <div class="intel-run-bar">
+            <div class="desc">Enumerate subdomains via crt.sh certificate transparency logs — no bruteforce required</div>
+            <button class="btn-intel" id="btnRunSubdomains">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Enumerate Subdomains
+            </button>
+          </div>
+          <div class="subdomains-toolbar" id="subdomainsToolbar" style="display:none;">
+            <input type="text" class="subdomain-search" id="subdomainSearch" placeholder="Search subdomains...">
+            <span class="subdomain-count" id="subdomainCount"></span>
+          </div>
+          <div class="tbl-wrap">
+            <table class="data-table" id="subdomainsTable" style="display:none;">
+              <thead>
+                <tr>
+                  <th>Subdomain</th>
+                  <th>Issuer</th>
+                  <th>Not Before</th>
+                  <th>Not After</th>
+                </tr>
+              </thead>
+              <tbody id="subdomainsTableBody"></tbody>
+            </table>
+          </div>
+          <div id="subdomainsEmpty">
+            <div class="empty-state" style="padding:40px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/>
+                <circle cx="12" cy="10" r="3"/>
+              </svg>
+              Click "Enumerate Subdomains" to discover subdomains via certificate transparency.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== CERT TRANSPARENCY PAGE ===== -->
+      <div class="page" id="pageCerts">
+        <div class="card">
+          <div class="intel-run-bar">
+            <div class="desc">Browse all SSL certificates ever issued for this domain via crt.sh transparency logs</div>
+            <button class="btn-intel" id="btnRunCerts">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+              Fetch Certificates
+            </button>
+          </div>
+          <div id="certsContent">
+            <div class="empty-state" style="padding:40px;">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+              Click "Fetch Certificates" to view the certificate transparency history for this domain.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== TERMINAL PAGE ===== -->
+      <div class="page" id="pageTerminal">
+        <div class="card">
+          <div class="term-header">
+            <span class="term-title">Live Event Stream</span>
+            <button class="btn-sm" id="btnClearLog">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+              </svg>
+              Clear
+            </button>
+          </div>
+          <div class="terminal" id="terminalBody">
+            <div class="log-line info">[SYSTEM] AegisScan v3.1 initialized</div>
+            <div class="log-line info">[SYSTEM] Ready — enter a target and run scan</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end .page-container -->
+  </div><!-- end .main -->
+</div><!-- end .shell -->
+
+<!-- Toast -->
+<div class="toast-area" id="toastArea"></div>
 
 <script src="/app.js"></script>
 </body>
